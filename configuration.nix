@@ -1,51 +1,46 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ ./hardware-configuration.nix ];
+  imports = [
+    ./hardware-configuration.nix
+  ];
 
-  # Boot (UEFI - recomendado)
+  # Bootloader - systemd-boot para UEFI
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Kernel
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  # Hostname
   networking.hostName = "nixos";
-  networking.networkmanager.enable = true;
 
-  time.timeZone = "America/Recife";
-  i18n.defaultLocale = "pt_BR.UTF-8";
+  # Rede
+  networking.networkManager.enable = true;
 
-  # usuário
-  users.users.bart = {
+  # Time zone
+  time.timeZone = "America/Sao_Paulo";
+
+  # Locale
+  i18n.defaultLocale = "en_US.UTF-8";
+  
+  # Console - VERSÃO CORRIGIDA
+  console.keyMap = "us";
+  console.font = "Lat2-Terminus16";
+
+  # Usuário (opcional)
+  users.users.nixos = {
     isNormalUser = true;
+    initialPassword = "nixos";
     extraGroups = [ "wheel" "networkmanager" ];
   };
 
-  security.sudo.enable = true;
+  # Senha do root (caso não queira criar usuário)
+  users.users.root.initialPassword = "nixos";
 
-  # Hyprland (Wayland)
-  programs.hyprland.enable = true;
+  # SSH
+  services.openssh.enable = true;
 
-  # login automático simples (sem display manager pesado)
-  services.greetd = {
-    enable = true;
-    settings.default_session = {
-      command = "Hyprland";
-      user = "bart";
-    };
-  };
-
-  # som (necessário pro volume funcionar)
-  services.pipewire.enable = true;
-
-  # pacotes MINIMOS que você pediu
-  environment.systemPackages = with pkgs; [
-    vscode
-    kitty
-    nano
-    git
-    wget
-    firefox
-  ];
-
-  system.stateVersion = "25.11";
+  # Versão do sistema
+  system.stateVersion = "24.11";
 }
